@@ -1,0 +1,1 @@
+console.log("TEAjudo carregado com sucesso!");

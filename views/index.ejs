@@ -1,27 +1,89 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
 
-<section class="hero">
-    <h2>Bem-vindo ao TEAjudo</h2>
-    <p>
-        Uma plataforma digital interativa criada para apoiar a comunicação,
-        a inclusão social e o acesso a informações confiáveis sobre o Transtorno do Espectro Autista.
-    </p>
-    <a href="/sobre" class="btn">Conheça o projeto</a>
-</section>
+    <meta charset="UTF-8">
+    <title>TEAjudo</title>
 
-<section class="cards">
-    <div class="card">
-        <h3>Informações claras</h3>
-        <p>Conteúdos organizados em linguagem simples e acessível.</p>
-    </div>
-    <div class="card">
-        <h3>Orientação prática</h3>
-        <p>Dicas para situações do cotidiano em casa, na escola e na comunidade.</p>
-    </div>
-    <div class="card">
-        <h3>Apoio com IA</h3>
-        <p>Uma área para auxiliar dúvidas e indicar caminhos de ação.</p>
-    </div>
-</section>
+    <link rel="stylesheet" href="/css/style.css">
 
-<%- include('partials/footer') %>
+</head>
+<body>
+
+    <%- include("./partials/header") %>
+
+    <section class="hero">
+
+        <span class="badge">
+            Bem-vindo ao TEAjudo
+        </span>
+
+        <h1>
+            Apoio na Comunicação e <br>
+            Interação Social
+        </h1>
+
+        <a href="/ia" class="main-btn">
+            Começar chat IA →
+        </a>
+
+    </section>
+
+    <section class="cards-section">
+
+        <h2>Como Podemos Ajudar</h2>
+
+        <p>
+            Oferecemos ferramentas e recursos para apoiar o desenvolvimento e bem-estar
+        </p>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>Informações Confiáveis</h3>
+
+                <p>
+                   Baseamos nossos conteúdos em pesquisas acadêmicas e em referências reconhecidas na área do autismo, 
+                   como a psicóloga Mayra Gaiato, a equipe da Luna ABA, o Dr. Thiago Lopes (especialista em intervenção precoce) e a psicóloga Aída Brito.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Chat com IA</h3>
+
+                <p>
+                    Nosso assistente virtual foi treinado para responder apenas com as informações 
+                    que estão dentro do próprio site. Isso significa que cada resposta é baseada nos nossos
+                     artigos, guias e orientações – nada de "achismos" ou fontes externas. Você pode tirar 
+                     dúvidas específicas, pedir sugestões de leitura e receber direcionamentos práticos,
+                      sempre com a garantia de que a resposta vem do nosso conteúdo confiável.
+                </p>
+
+            </div>
+
+        
+
+        </div>
+
+    </section>
+
+    <section class="missao">
+
+        <h2>Nossa Missão</h2>
+
+        <p>
+           O TEAjudo nasceu como um Trabalho de Conclusão de Curso com o objetivo de 
+           facilitar a comunicação e a inclusão social de pessoas autistas.
+            Queremos centralizar informações de qualidade, oferecer suporte com inteligência 
+            artificial e criar ferramentas que ajudem no cotidiano – de famílias a educadores.
+             Acreditamos que conhecimento acessível e empatia são os primeiros passos para uma
+              sociedade mais inclusiva.
+        </p>
+
+    </section>
+
+</body>
+</html>

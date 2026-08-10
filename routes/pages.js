@@ -1,28 +1,29 @@
-const express = require('express');
+const express = require("express");
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.render('index');
+router.get("/", (req, res) => {
+  res.render("index");
 });
 
-router.get('/sobre', (req, res) => {
-    res.render('sobre');
+router.get("/informacoes", (req, res) => {
+  res.render("inclusao");
 });
 
-router.get('/recursos', (req, res) => {
-    res.render('recursos');
+router.get("/ia", (req, res) => {
+  res.render("ia");
 });
 
-router.get('/inclusao', (req, res) => {
-    res.render('inclusao');
+router.get("/sobre", (req, res) => {
+  res.render("sobre");
 });
 
-router.get('/ia', (req, res) => {
-    res.render('ia');
+router.get("/login", (req, res) => {
+  res.render("login");
 });
 
-router.get('/contato', (req, res) => {
-    res.render('contato');
+router.get("/cadastro", (req, res) => {
+  res.render("cadastro");
 });
 
 module.exports = router;

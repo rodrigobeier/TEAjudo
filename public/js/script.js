@@ -1,1 +1,1 @@
-console.log("TEAjudo carregado com sucesso!");
+console.log("TEAjudo carregado!");

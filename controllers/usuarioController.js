@@ -27,18 +27,22 @@ module.exports = {
     }
   },
 
-  // Criar um novo usuário
   async store(req, res) {
     try {
-      const { nome, email, senha } = req.body;
-      // Aqui você pode adicionar validações e hash de senha
-      const novoUsuario = await Usuario.create({ nome, email, senha });
-      return res.status(201).json(novoUsuario);
+        const { nome, email, senha } = req.body;
+        // Aqui você pode adicionar validações e hash de senha
+        const novoUsuario = await Usuario.create({ nome, email, senha });
+        return res.status(201).json(novoUsuario);
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro ao criar usuário' });
+        console.error(error);
+        // Verifica se é erro de duplicidade (código 1062 no MySQL)
+        if (error.name === 'SequelizeUniqueConstraintError' || error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'Este e-mail já está cadastrado.' });
+        }
+        // Outros erros
+        return res.status(500).json({ error: 'Erro ao criar usuário' });
     }
-  },
+}
 
   // Atualizar um usuário
   async update(req, res) {

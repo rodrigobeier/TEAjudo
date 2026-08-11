@@ -1,29 +1,52 @@
 const db = require("../database/db");
 
 const Usuario = {
+  // Cadastrar um novo usuário (retorna Promise)
+  cadastrar(nome, email, senha) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        INSERT INTO usuarios (nome, email, senha)
+        VALUES (?, ?, ?)
+      `;
+      db.query(sql, [nome, email, senha], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  },
 
-    cadastrar(nome, email, senha, callback) {
+  // Buscar usuário por email (para login, etc.)
+  buscarPorEmail(email) {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM usuarios WHERE email = ?`;
+      db.query(sql, [email], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows[0]);
+      });
+    });
+  },
 
-        const sql = `
-            INSERT INTO usuarios (nome, email, senha)
-            VALUES (?, ?, ?)
-        `;
+  // Buscar por ID
+  buscarPorId(id) {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM usuarios WHERE id = ?`;
+      db.query(sql, [id], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows[0]);
+      });
+    });
+  },
 
-        db.query(sql, [nome, email, senha], callback);
-    },
-
-    buscarPorEmail(email, callback) {
-
-        const sql = "SELECT * FROM usuarios WHERE email = ?";
-
-        db.query(sql, [email], callback);
-    },
-
-    listar(callback) {
-
-        db.query("SELECT * FROM usuarios", callback);
-    }
-
+  // Listar todos
+  listar() {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM usuarios ORDER BY id`;
+      db.query(sql, (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows);
+      });
+    });
+  }
 };
 
 module.exports = Usuario;

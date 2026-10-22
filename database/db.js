@@ -1,7 +1,6 @@
 const mysql = require("mysql2");
 require("dotenv").config();
 
-// Cria um pool de conexões (recomendado para aplicações web)
 const pool = mysql.createPool({
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
@@ -11,21 +10,23 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    // Se a variável DB_SSL for "true", ativa SSL (necessário para Aiven)
+    connectTimeout: 10000,  
     ssl: {
-    rejectUnauthorized: false
-}
+        rejectUnauthorized: false
+    }
+});
+pool.on('error', (err) => {
+    console.error('Erro na pool:', err.message);
 });
 
-// Testa a conexão (opcional, mas útil)
+// Testa a conexão
 pool.getConnection((err, connection) => {
     if (err) {
-        console.error("Erro ao conectar ao banco de dados:", err.message);
+        console.error("Erro ao conectar ao banco:", err.message);
         return;
     }
     console.log("Banco de dados conectado!");
-    connection.release(); // libera a conexão de volta ao pool
+    connection.release();
 });
 
-// Exporta o pool com suporte a promises (async/await)
 module.exports = pool.promise();

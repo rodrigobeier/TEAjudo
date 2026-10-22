@@ -1,35 +1,39 @@
-const express = require("express");
-const path = require("path");
-const db = require("./database/db.js");
-const app = express();
-
-// Configurações da view engine
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views")); // explícito, mas opcional
-
-// Middlewares
-app.use(express.json());              // para ler requisições com JSON
-app.use(express.urlencoded({ extended: true })); // para ler formulários HTML
-app.use(express.static(path.join(__dirname, "public")));
-
-// Rotas
-// Rotas de páginas (front-end)
-app.use("/", require("./routes/pages.js"));
-
-// Rotas de API (back-end)
-app.use("/api/usuarios", require("./routes/usuarioRoutes.js"));
-app.use("/api/conversas", require("./routes/conversaRoutes.js"));
-app.use("/api/mensagens", require("./routes/mensagemRoutes.js"));
-
-// ✅ CORRETO (CommonJS)
-const { ingestContent } = require("./services/ragService.js");
-
-// Carrega a base de conhecimento ao iniciar
-ingestContent().then(() => {
-  console.log("📚 Base de conhecimento carregada!");
+process.on('uncaughtException', (err) => {
+  console.error('Exceção não tratada:', err.message);
 });
 
-// Inicialização do servidor
+process.on('unhandledRejection', (reason) => {
+  console.error('Promise rejeitada:', reason?.message || reason);
+});
+
+const express = require("express");
+const path = require("path");
+const dotenv = require("dotenv");
+const { ingestContent } = require("./services/ragService");
+
+dotenv.config();
+
+const app = express();
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/", require("./routes/pages"));
+
+app.use("/api/usuarios", require("./routes/usuarioRoutes"));
+app.use("/api/conversas", require("./routes/conversaRoutes"));
+app.use("/api/mensagens", require("./routes/mensagemRoutes"));
+
+ingestContent().then(() => {
+  console.log("Base de conhecimento carregada!");
+}).catch(err => {
+  console.error("Erro ao carregar base:", err);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);

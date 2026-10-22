@@ -1,73 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-
     <meta charset="UTF-8">
     <title>Chat IA - TEAjudo</title>
-
-    <link rel="stylesheet" href="/css/style.css">
-
+    <link rel="stylesheet" href="/css/style.css?v=3">
 </head>
 <body>
 
     <%- include("./partials/header") %>
 
     <div class="chat-container">
-
-        <!-- Sidebar com histórico de conversas -->
         <aside class="sidebar">
             <button class="new-chat" id="btnNovaConversa">+ Nova conversa</button>
-            <div class="history" id="listaConversas">
-                <!-- As conversas serão adicionadas aqui via JavaScript -->
-            </div>
+            <div class="history" id="listaConversas"></div>
         </aside>
 
-        <!-- Área principal do chat -->
         <main class="chat-main">
-
             <div class="chat-header">
                 <h1 id="tituloChat">Como posso ajudar?</h1>
             </div>
 
-            <!-- Caixa de mensagens -->
-            <div class="chat-box" id="chatBox">
-                <!-- As mensagens serão inseridas aqui via JavaScript -->
-            </div>
+            <div class="chat-box" id="chatBox"></div>
 
-            <!-- Input e botão enviar -->
             <div class="chat-input">
-                <input type="text" id="inputMensagem" placeholder="Digite sua pergunta sobre o TEA..." autofocus>
-                <button id="btnEnviar">➤</button>
+                <input type="text" id="inputMensagem" placeholder="Digite sua pergunta sobre o TEA...">
+                <button id="btnEnviar">Enviar</button>
             </div>
-
         </main>
-
     </div>
 
     <script>
-       
         let conversaAtual = 1;
-        const usuario = 'usuario';
-        const ia = 'ia';
 
         const chatBox = document.getElementById('chatBox');
         const inputMsg = document.getElementById('inputMensagem');
         const btnEnviar = document.getElementById('btnEnviar');
         const btnNova = document.getElementById('btnNovaConversa');
-        const tituloChat = document.getElementById('tituloChat');
 
-        function adicionarMensagem(texto, autor, extra = '') {
+        function adicionarMensagem(texto, autor) {
             const div = document.createElement('div');
-            div.className = `mensagem ${autor}`;
-            if (extra) div.classList.add(extra);
+            div.className = 'mensagem ' + autor;
             div.textContent = texto;
+            chatBox.classList.add('com-mensagens');
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function removerDigitando() {
-            const digitando = chatBox.querySelector('.mensagem.digitando');
-            if (digitando) digitando.remove();
+            const d = chatBox.querySelector('.digitando');
+            if (d) d.remove();
         }
 
         function mostrarDigitando() {
@@ -75,15 +56,18 @@
             const div = document.createElement('div');
             div.className = 'mensagem ia digitando';
             div.textContent = 'Digitando...';
+            chatBox.classList.add('com-mensagens');
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function limparChat() {
             chatBox.innerHTML = '';
+            chatBox.classList.remove('com-mensagens');
         }
 
         async function enviarMensagem() {
+            console.log('enviarMensagem chamada');
             const texto = inputMsg.value.trim();
             if (!texto) return;
 
@@ -91,7 +75,6 @@
             inputMsg.value = '';
             inputMsg.disabled = true;
             btnEnviar.disabled = true;
-
             mostrarDigitando();
 
             try {
@@ -105,25 +88,23 @@
                     })
                 });
 
+                console.log('Status da resposta:', response.status);
                 const data = await response.json();
+                console.log('Dados recebidos:', data);
 
                 removerDigitando();
 
                 if (data.mensagemIA) {
                     adicionarMensagem(data.mensagemIA.texto, 'ia');
                 } else if (data.erroIA) {
-                    adicionarMensagem('Desculpe, não consegui gerar uma resposta. Tente novamente mais tarde.', 'sistema');
-                } else if (data.mensagem) {
-                    if (data.mensagem.autor === 'ia') {
-                        adicionarMensagem(data.mensagem.texto, 'ia');
-                    }
+                    adicionarMensagem('Nao consegui gerar resposta. Tente novamente.', 'sistema');
                 } else {
                     adicionarMensagem('Resposta inesperada do servidor.', 'sistema');
                 }
             } catch (error) {
-                console.error(error);
+                console.error('Erro no fetch:', error);
                 removerDigitando();
-                adicionarMensagem('Erro de conexão. Verifique sua internet e tente novamente.', 'sistema');
+                adicionarMensagem('Erro de conexao.', 'sistema');
             } finally {
                 inputMsg.disabled = false;
                 btnEnviar.disabled = false;
@@ -131,45 +112,19 @@
             }
         }
 
-        async function carregarHistorico(conversaId) {
-            try {
-                const response = await fetch(`/api/mensagens?conversa_id=${conversaId}`);
-                if (!response.ok) throw new Error('Erro ao carregar histórico');
-                const mensagens = await response.json();
-
-                limparChat();
-
-                if (mensagens.length === 0) {
-                    adicionarMensagem('Nenhuma mensagem ainda. Comece a conversa!', 'ia');
-                } else {
-                    mensagens.forEach(msg => {
-                        adicionarMensagem(msg.texto, msg.autor);
-                    });
-                }
-                chatBox.scrollTop = chatBox.scrollHeight;
-            } catch (error) {
-                console.error(error);
-                adicionarMensagem('Erro ao carregar histórico.', 'sistema');
-            }
+        function criarNovaConversa() {
+            conversaAtual = Date.now();
+            limparChat();
+            adicionarMensagem('Nova conversa iniciada! Pergunte sobre o TEA.', 'ia');
         }
 
-       async function criarNovaConversa() {
-    conversaAtual = Date.now();
-    limparChat();
-    adicionarMensagem('Nova conversa iniciada! Pergunte sobre o TEA.', 'ia');
-}
-
         btnEnviar.addEventListener('click', enviarMensagem);
-
-        inputMsg.addEventListener('keypress', (e) => {
+        inputMsg.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') enviarMensagem();
         });
-
         btnNova.addEventListener('click', criarNovaConversa);
 
-        inputMsg.focus();
-
-        console.log('Chat IA inicializado com sucesso!');
+        console.log('Chat IA inicializado!');
     </script>
 
 </body>

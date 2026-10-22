@@ -1,51 +1,31 @@
 const db = require("../database/db");
 
 const Usuario = {
-  // Cadastrar um novo usuário (retorna Promise)
-  cadastrar(nome, email, senha) {
-    return new Promise((resolve, reject) => {
-      const sql = `
-        INSERT INTO usuarios (nome, email, senha)
-        VALUES (?, ?, ?)
-      `;
-      db.query(sql, [nome, email, senha], (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      });
-    });
+  async cadastrar(nome, email, senha) {
+    const sql = `
+      INSERT INTO usuarios (nome, email, senha)
+      VALUES (?, ?, ?)
+    `;
+    const [result] = await db.query(sql, [nome, email, senha]);
+    return result;
   },
 
-  // Buscar usuário por email (para login, etc.)
-  buscarPorEmail(email) {
-    return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM usuarios WHERE email = ?`;
-      db.query(sql, [email], (err, rows) => {
-        if (err) return reject(err);
-        resolve(rows[0]);
-      });
-    });
+  async buscarPorEmail(email) {
+    const sql = `SELECT * FROM usuarios WHERE email = ?`;
+    const [rows] = await db.query(sql, [email]);
+    return rows[0];
   },
 
-  // Buscar por ID
-  buscarPorId(id) {
-    return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM usuarios WHERE id = ?`;
-      db.query(sql, [id], (err, rows) => {
-        if (err) return reject(err);
-        resolve(rows[0]);
-      });
-    });
+  async buscarPorId(id) {
+    const sql = `SELECT * FROM usuarios WHERE id = ?`;
+    const [rows] = await db.query(sql, [id]);
+    return rows[0];
   },
 
-  // Listar todos
-  listar() {
-    return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM usuarios ORDER BY id`;
-      db.query(sql, (err, rows) => {
-        if (err) return reject(err);
-        resolve(rows);
-      });
-    });
+  async listar() {
+    const sql = `SELECT * FROM usuarios ORDER BY id`;
+    const [rows] = await db.query(sql);
+    return rows;
   }
 };
 

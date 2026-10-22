@@ -468,18 +468,21 @@ body{
 }
 
 .chat-box {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px 20px;
+    display: none;             
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto 20px auto;
+    padding: 20px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-bottom: 15px;
-    display: flex;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     flex-direction: column;
     gap: 10px;
-    min-height: 300px;
-    max-height: 500px;
+    height: 400px;                 /* altura fixa */
+    overflow-y: auto;              /* rola por dentro se passar */
+}
+.chat-box.com-mensagens {
+    display: flex;          
 }
 
 .mensagem {

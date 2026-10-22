@@ -1,48 +1,41 @@
-const Mensagem = require('../models/mensagem'); // importação correta (sem desestruturação)
+const Mensagem = require('../models/mensagem');
 const { askRAG } = require('../services/ragService');
 
 module.exports = {
-  // 1. LISTAR MENSAGENS DE UMA CONVERSA
   async index(req, res) {
     const { conversa_id } = req.query;
     if (!conversa_id) {
       return res.status(400).json({ error: 'conversa_id é obrigatório' });
     }
-
     Mensagem.listar(conversa_id, (err, mensagens) => {
       if (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Erro ao listar mensagens' });
+        return res.status(500).json({ error: 'Erro ao listar' });
       }
       return res.json(mensagens);
     });
   },
 
-  // 2. CRIAR UMA NOVA MENSAGEM (E CHAMAR A IA)
   async store(req, res) {
+    console.log('[STORE] Recebido:', req.body);
     try {
       const { conversa_id, autor, texto } = req.body;
 
-      // Salva a mensagem do usuário
-      Mensagem.salvar(conversa_id, autor, texto, async (err, result) => {
+      Mensagem.salvar(conversa_id, autor, texto, async (err) => {
         if (err) {
-          console.error(err);
+          console.error('[STORE] Erro ao salvar:', err.message);
           return res.status(500).json({ error: 'Erro ao salvar mensagem' });
         }
 
-        // Se a mensagem veio de um usuário, chama a IA
         if (autor === 'usuario') {
           try {
+            console.log('[STORE] Chamando askRAG...');
             const respostaIA = await askRAG(texto);
+            console.log('[STORE] Resposta da IA:', respostaIA);
 
-            // Salva a resposta da IA
-            Mensagem.salvar(conversa_id, 'ia', respostaIA, (errIa, resultIa) => {
+            Mensagem.salvar(conversa_id, 'ia', respostaIA, (errIa) => {
               if (errIa) {
-                console.error(errIa);
-                return res.status(201).json({
-                  mensagemUsuario: { conversa_id, autor, texto },
-                  erroIA: 'Erro ao salvar resposta da IA'
-                });
+                console.error('[STORE] Erro ao salvar IA:', errIa.message);
               }
               return res.status(201).json({
                 mensagemUsuario: { conversa_id, autor, texto },
@@ -50,50 +43,27 @@ module.exports = {
               });
             });
           } catch (error) {
-            console.error(error);
+            console.error('[STORE] Erro no askRAG:', error.message);
             return res.status(201).json({
               mensagemUsuario: { conversa_id, autor, texto },
-              erroIA: 'Erro ao gerar resposta da IA'
+              erroIA: 'Erro ao gerar resposta'
             });
           }
         } else {
-          // Se for mensagem da IA ou sistema, retorna apenas ela
           return res.status(201).json({ mensagem: { conversa_id, autor, texto } });
         }
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: 'Erro ao processar mensagem' });
+      return res.status(500).json({ error: 'Erro interno' });
     }
   },
 
-  // 3. (OPCIONAL) ATUALIZAR MENSAGEM
-  async update(req, res) {
-    try {
-      const { id } = req.params;
-      const { texto } = req.body;
-      // Se você tiver um método de atualização no modelo, use-o aqui.
-      // Exemplo: Mensagem.atualizar(id, texto, callback)
-      // Como não temos, retornamos erro.
-      return res.status(501).json({ error: 'Atualização não implementada' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro ao atualizar mensagem' });
-    }
+  update(req, res) {
+    return res.status(501).json({ error: 'Não implementado' });
   },
 
-  // 4. DELETAR MENSAGEM
-  async destroy(req, res) {
-    try {
-      const { id } = req.params;
-      // Se você tiver um método de deletar no modelo, use-o aqui.
-      // Exemplo: Mensagem.deletar(id, callback)
-      // Como não temos, retornamos erro.
-      return res.status(501).json({ error: 'Deleção não implementada' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro ao deletar mensagem' });
-    }
+  destroy(req, res) {
+    return res.status(501).json({ error: 'Não implementado' });
   }
-
 };

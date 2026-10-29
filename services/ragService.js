@@ -13,9 +13,9 @@ let extractor = null;
 
 async function getExtractor() {
   if (!extractor) {
-    console.log('🔄 Carregando modelo de embeddings...');
+    console.log('Carregando modelo de embeddings...');
     extractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
-    console.log('✅ Modelo carregado!');
+    console.log('Modelo carregado!');
   }
   return extractor;
 }
@@ -24,7 +24,7 @@ async function ingestContent() {
   const conteudoDir = path.join(__dirname, "..", "conteudo");
   if (!fs.existsSync(conteudoDir)) {
     fs.mkdirSync(conteudoDir);
-    console.log("⚠️ Pasta 'conteudo' criada. Adicione seus arquivos .txt nela.");
+    console.log("Pasta 'conteudo' criada. Adicione seus arquivos .txt nela.");
     return;
   }
   const files = fs.readdirSync(conteudoDir);
@@ -49,7 +49,7 @@ async function ingestContent() {
   }
 
   knowledgeBase = chunks;
-  console.log(`✅ ${chunks.length} chunks carregados.`);
+  console.log(`${chunks.length} chunks carregados.`);
 }
 
 function findRelevantChunks(questionEmbedding, topK = 2) {

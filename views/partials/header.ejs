@@ -11,9 +11,14 @@
         <a href="/ia">Chat com IA</a>
         <a href="/sobre">Sobre</a>
 
-        <a href="/login" class="perfil-btn">
-            Perfil
-        </a>
+        <% if (session && session.usuarioId) { %>
+            <!-- SE ESTIVER LOGADO -->
+            <a href="/perfil" class="perfil-btn">Perfil</a>
+            <a href="/logout" style="color: #ff6b6b; font-weight: bold; margin-left: 10px;">Sair</a>
+        <% } else { %>
+            <!-- SE NÃO ESTIVER LOGADO -->
+            <a href="/login" class="perfil-btn">Entrar</a>
+        <% } %>
 
     </nav>
 

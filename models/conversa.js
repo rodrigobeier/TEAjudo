@@ -1,28 +1,24 @@
 const db = require("../database/db");
 
 const Conversa = {
+  async criar(titulo, usuario_id) {
+    const sql = `
+      INSERT INTO conversas (titulo, usuario_id)
+      VALUES (?, ?)
+    `;
+    const [result] = await db.query(sql, [titulo, usuario_id]);
+    return result.insertId;
+  },
 
-    criar(titulo, usuario_id, callback) {
-
-        const sql = `
-            INSERT INTO conversas (titulo, usuario_id)
-            VALUES (?, ?)
-        `;
-
-        db.query(sql, [titulo, usuario_id], callback);
-    },
-
-    listar(usuario_id, callback) {
-
-        const sql = `
-            SELECT * FROM conversas
-            WHERE usuario_id = ?
-            ORDER BY data_criacao DESC
-        `;
-
-        db.query(sql, [usuario_id], callback);
-    }
-
+  async listar(usuario_id) {
+    const sql = `
+      SELECT * FROM conversas
+      WHERE usuario_id = ?
+      ORDER BY data_criacao DESC
+    `;
+    const [rows] = await db.query(sql, [usuario_id]);
+    return rows;
+  }
 };
 
 module.exports = Conversa;

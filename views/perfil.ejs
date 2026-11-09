@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu Perfil - TEAjudo</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <%- include("./partials/header") %>
+
+    <section class="sobre-page">
+        
+        <h1>Meu Perfil</h1>
+
+        <div class="sobre-box">
+            <h2>Dados da Conta</h2>
+            
+            <!-- Exibe o nome e email do usuário logado -->
+            <p><strong>Nome:</strong> <%= usuario.nome %></p>
+            <p><strong>E-mail:</strong> <%= usuario.email %></p>
+
+            <hr style="margin: 30px 0; border: 1px solid #f0f0f0;">
+
+            <h2>Histórico de Conversas</h2>
+            <p style="color: #666; font-style: italic;">
+                Em breve, você poderá ver aqui o histórico de todas as suas conversas com a IA do TEAjudo.
+            </p>
+
+            <!-- Botão para sair da conta -->
+            <a href="/logout" class="voltar-home" style="margin-top: 20px; background-color: #ffcccc; color: #cc0000;">
+                Sair da conta
+            </a>
+        </div>
+
+    </section>
+
+</body>
+</html>

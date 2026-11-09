@@ -1,11 +1,22 @@
-  Muitas pessoas autistas têm o que chamamos de hipersensibilidade 
-ou hipossensibilidade sensorial. Isso significa que os sentidos delas 
-podem funcionar de forma mais intensa ou mais fraca do que o comum. 
-Por exemplo:
-*Sons que para nós são normais (como o barulho de um liquidificador ou de uma festa) 
-podem ser insuportáveis para uma pessoa autista.
-*Luzes muito fortes ou piscantes podem causar desconforto e até dor de cabeça.
-*Texturas de roupas ou de alimentos podem ser rejeitadas simplesmente porque 
-"incomodam" de uma forma que não conseguimos explicar.
-Respeitar essas preferências — oferecendo alternativas e evitando forçar 
-situações que gerem desconforto — é uma forma de cuidado essencial.
+Muitas pessoas autistas têm o que chamamos de hipersensibilidade ou hipossensibilidade sensorial. Isso significa que os sentidos delas podem funcionar de forma mais intensa ou mais fraca do que o comum.
+
+Sensibilidade a Sons
+Sons que para pessoas neurotípicas são normais, como o barulho de um liquidificador ou de uma festa, podem ser insuportáveis para uma pessoa autista. Isso ocorre devido à hipersensibilidade auditiva.
+
+Sensibilidade a Luzes
+Luzes muito fortes ou piscantes podem causar grande desconforto e até dor de cabeça em pessoas no espectro autista.
+
+Sensibilidade a Texturas
+Texturas de roupas ou de alimentos podem ser rejeitadas pela pessoa autista simplesmente porque "incomodam" de uma forma que não conseguimos explicar. A recusa não é birra, mas sim uma resposta ao desconforto sensorial.
+
+Como Ajudar e Respeitar
+Respeitar essas preferências é uma forma de cuidado essencial. Ofereça alternativas e evite forçar situações que gerem desconforto. Entender as questões sensoriais é fundamental para a inclusão.
+
+O que mudou e por que ajuda a IA:
+Substituição dos asteriscos: Os itens da lista agora são parágrafos com títulos claros ("Sensibilidade a Sons", "Sensibilidade a Luzes").
+
+Palavras-chave adicionadas: Incluí termos como "hipersensibilidade auditiva" e "pessoas neurotípicas", que podem ser usados nas buscas.
+
+Facilidade de busca: Se um usuário perguntar "Por que meu filho autista não gosta de barulho?", a IA vai encontrar o bloco exato sobre "Sensibilidade a Sons".
+
+This response is AI-generated, for reference only.

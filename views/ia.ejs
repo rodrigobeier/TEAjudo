@@ -9,7 +9,11 @@
 
     <%- include("./partials/header") %>
 
-    <div class="chat-container">
+    <div class="chat-container" 
+         id="appChat" 
+         data-conversa="<%= conversaId %>" 
+         data-historico="<%= JSON.stringify(historico) %>">
+         
         <aside class="sidebar">
             <button class="new-chat" id="btnNovaConversa">+ Nova conversa</button>
             <div class="history" id="listaConversas"></div>
@@ -30,12 +34,34 @@
     </div>
 
     <script>
-        let conversaAtual = 1;
+        const appChat = document.getElementById('appChat');
+        let conversaAtual = appChat.dataset.conversa;
+        
+        const historicoString = appChat.dataset.historico.replace(/&quot;/g, '"');
+        const historico = JSON.parse(historicoString);
 
         const chatBox = document.getElementById('chatBox');
         const inputMsg = document.getElementById('inputMensagem');
         const btnEnviar = document.getElementById('btnEnviar');
         const btnNova = document.getElementById('btnNovaConversa');
+        const listaConversas = document.getElementById('listaConversas');
+
+        if (historico && historico.length > 0) {
+            listaConversas.innerHTML = ''; 
+            
+            historico.forEach(conv => {
+                const div = document.createElement('div');
+                div.className = conv.id == conversaAtual ? 'history-item ativo' : 'history-item';
+                div.textContent = conv.titulo;
+                div.onclick = () => {
+                    conversaAtual = conv.id;
+                    document.querySelectorAll('.history-item').forEach(el => el.classList.remove('ativo'));
+                    div.classList.add('ativo');
+                    carregarHistorico(conv.id);
+                };
+                listaConversas.appendChild(div);
+            });
+        }
 
         function adicionarMensagem(texto, autor) {
             const div = document.createElement('div');
@@ -67,9 +93,16 @@
         }
 
         async function enviarMensagem() {
-            console.log('enviarMensagem chamada');
             const texto = inputMsg.value.trim();
             if (!texto) return;
+
+            // Atualiza o título visualmente se for a primeira mensagem
+            if (chatBox.children.length === 0) {
+                const itemAtivo = document.querySelector('.history-item.ativo');
+                if (itemAtivo) {
+                    itemAtivo.textContent = texto.length > 30 ? texto.substring(0, 30) + '...' : texto;
+                }
+            }
 
             adicionarMensagem(texto, 'usuario');
             inputMsg.value = '';
@@ -88,10 +121,7 @@
                     })
                 });
 
-                console.log('Status da resposta:', response.status);
                 const data = await response.json();
-                console.log('Dados recebidos:', data);
-
                 removerDigitando();
 
                 if (data.mensagemIA) {
@@ -112,10 +142,28 @@
             }
         }
 
-        function criarNovaConversa() {
-            conversaAtual = Date.now();
+        async function carregarHistorico(idConversa) {
             limparChat();
-            adicionarMensagem('Nova conversa iniciada! Pergunte sobre o TEA.', 'ia');
+            try {
+                const response = await fetch('/api/mensagens?conversa_id=' + idConversa);
+                const mensagens = await response.json();
+                
+                if (mensagens.length === 0) {
+                    adicionarMensagem('Esta conversa não tem mensagens.', 'sistema');
+                } else {
+                    mensagens.forEach(msg => {
+                        adicionarMensagem(msg.texto, msg.autor);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar histórico:', error);
+                adicionarMensagem('Erro ao carregar o histórico.', 'sistema');
+            }
+        }
+
+        // ALTERADO AQUI: Redireciona forçando a criação de uma nova conversa
+        function criarNovaConversa() {
+            window.location.href = '/ia?nova=true';
         }
 
         btnEnviar.addEventListener('click', enviarMensagem);
@@ -124,7 +172,6 @@
         });
         btnNova.addEventListener('click', criarNovaConversa);
 
-        console.log('Chat IA inicializado!');
     </script>
 
 </body>

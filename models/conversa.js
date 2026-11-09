@@ -18,6 +18,12 @@ const Conversa = {
     `;
     const [rows] = await db.query(sql, [usuario_id]);
     return rows;
+  },
+
+  // NOVA FUNÇÃO AQUI
+  async atualizarTitulo(id, novo_titulo) {
+    const sql = `UPDATE conversas SET titulo = ? WHERE id = ?`;
+    await db.query(sql, [novo_titulo, id]);
   }
 };
 

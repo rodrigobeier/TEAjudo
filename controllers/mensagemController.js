@@ -1,4 +1,5 @@
 const Mensagem = require('../models/mensagem');
+const Conversa = require('../models/conversa'); // Adicionado
 const { askRAG } = require('../services/ragService');
 
 module.exports = {
@@ -21,6 +22,18 @@ module.exports = {
     try {
       const { conversa_id, autor, texto } = req.body;
 
+      // Se for o usuário enviando a mensagem, verifica se é a primeira
+      if (autor === 'usuario') {
+        Mensagem.listar(conversa_id, async (err, mensagens) => {
+          if (!err && mensagens.length === 0) {
+            // Se estiver vazio, atualiza o título com a pergunta do usuário
+            const novoTitulo = texto.length > 30 ? texto.substring(0, 30) + '...' : texto;
+            await Conversa.atualizarTitulo(conversa_id, novoTitulo);
+          }
+        });
+      }
+
+      // Salva a mensagem
       Mensagem.salvar(conversa_id, autor, texto, async (err) => {
         if (err) {
           console.error('[STORE] Erro ao salvar:', err.message);

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Usuario = require("../models/usuario");
+const Conversa = require("../models/conversa");
 
 router.get("/", (req, res) => {
   res.render("index");
@@ -22,15 +23,45 @@ router.get("/cadastro", (req, res) => {
   res.render("cadastro");
 });
 
-// Rota do Chat: exige login
-router.get("/ia", (req, res) => {
+// Rota do Chat
+router.get("/ia", async (req, res) => {
   if (!req.session.usuarioId) {
     return res.redirect("/login");
   }
-  res.render("ia");
+
+  try {
+    let conversaId;
+    let historico = await Conversa.listar(req.session.usuarioId);
+
+    // Se a URL tiver ?nova=true (botão Nova Conversa)
+    if (req.query.nova === 'true') {
+      conversaId = await Conversa.criar("Nova conversa", req.session.usuarioId);
+      historico = await Conversa.listar(req.session.usuarioId); // Recarrega a lista com a nova
+    } 
+    // Se for acesso normal (voltando de outra página, por exemplo)
+    else {
+      // Se já tem conversas, abre a mais recente (a primeira da lista)
+      if (historico.length > 0) {
+        conversaId = historico[0].id;
+      } 
+      // Se for o primeiro acesso dele ao chat, cria a primeira conversa
+      else {
+        conversaId = await Conversa.criar("Nova conversa", req.session.usuarioId);
+        historico = await Conversa.listar(req.session.usuarioId);
+      }
+    }
+
+    res.render("ia", { 
+      conversaId: conversaId, 
+      historico: historico 
+    });
+  } catch (error) {
+    console.error("Erro no chat:", error);
+    res.status(500).send("Erro ao carregar o chat.");
+  }
 });
 
-// Rota do Perfil: exige login e busca dados no banco
+// Rota do Perfil
 router.get("/perfil", async (req, res) => {
   if (!req.session.usuarioId) {
     return res.redirect("/login");
@@ -38,14 +69,16 @@ router.get("/perfil", async (req, res) => {
 
   try {
     const usuario = await Usuario.buscarPorId(req.session.usuarioId);
-    res.render("perfil", { usuario });
+    const historico = await Conversa.listar(req.session.usuarioId);
+
+    res.render("perfil", { usuario, historico });
   } catch (error) {
     console.error("Erro ao carregar perfil:", error);
     res.status(500).send("Erro ao carregar o perfil.");
   }
 });
 
-// Rota de Logout: encerra a sessão e volta para a home
+// Rota de Logout
 router.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");

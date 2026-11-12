@@ -1,5 +1,5 @@
 const Mensagem = require('../models/mensagem');
-const Conversa = require('../models/conversa'); // Adicionado
+const Conversa = require('../models/conversa');
 const { askRAG } = require('../services/ragService');
 
 module.exports = {
@@ -22,18 +22,17 @@ module.exports = {
     try {
       const { conversa_id, autor, texto } = req.body;
 
-      // Se for o usuário enviando a mensagem, verifica se é a primeira
+      // Verifica se é a primeira mensagem para atualizar o título
       if (autor === 'usuario') {
         Mensagem.listar(conversa_id, async (err, mensagens) => {
           if (!err && mensagens.length === 0) {
-            // Se estiver vazio, atualiza o título com a pergunta do usuário
             const novoTitulo = texto.length > 30 ? texto.substring(0, 30) + '...' : texto;
             await Conversa.atualizarTitulo(conversa_id, novoTitulo);
           }
         });
       }
 
-      // Salva a mensagem
+      // Salva a mensagem atual
       Mensagem.salvar(conversa_id, autor, texto, async (err) => {
         if (err) {
           console.error('[STORE] Erro ao salvar:', err.message);
@@ -42,17 +41,29 @@ module.exports = {
 
         if (autor === 'usuario') {
           try {
-            console.log('[STORE] Chamando askRAG...');
-            const respostaIA = await askRAG(texto);
-            console.log('[STORE] Resposta da IA:', respostaIA);
-
-            Mensagem.salvar(conversa_id, 'ia', respostaIA, (errIa) => {
-              if (errIa) {
-                console.error('[STORE] Erro ao salvar IA:', errIa.message);
+            // BUSCA O HISTÓRICO RECENTE
+            Mensagem.listar(conversa_id, async (errList, mensagens) => {
+              let historicoTexto = "";
+              
+              if (!errList && mensagens) {
+                // Pega as últimas 5 mensagens (exclui a que acabou de ser salva)
+                const ultimas = mensagens.slice(-6, -1);
+                historicoTexto = ultimas.map(m => `${m.autor === 'usuario' ? 'Usuário' : 'IA'}: ${m.texto}`).join("\n");
               }
-              return res.status(201).json({
-                mensagemUsuario: { conversa_id, autor, texto },
-                mensagemIA: { conversa_id, autor: 'ia', texto: respostaIA }
+
+              console.log('[STORE] Chamando askRAG com histórico...');
+              // Passa a pergunta E o histórico para a IA
+              const respostaIA = await askRAG(texto, historicoTexto);
+              console.log('[STORE] Resposta da IA:', respostaIA);
+
+              Mensagem.salvar(conversa_id, 'ia', respostaIA, (errIa) => {
+                if (errIa) {
+                  console.error('[STORE] Erro ao salvar IA:', errIa.message);
+                }
+                return res.status(201).json({
+                  mensagemUsuario: { conversa_id, autor, texto },
+                  mensagemIA: { conversa_id, autor: 'ia', texto: respostaIA }
+                });
               });
             });
           } catch (error) {

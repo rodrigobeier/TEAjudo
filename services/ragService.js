@@ -34,7 +34,9 @@ async function ingestContent() {
   for (const file of files) {
     if (!file.endsWith(".txt") && !file.endsWith(".md")) continue;
     const content = fs.readFileSync(path.join(conteudoDir, file), "utf-8");
-    const chunkSize = 400;
+    
+    // AUMENTADO PARA 1000 PARA PEGAR O TEXTO INTEIRO DOS NÍVEIS JUNTOS
+    const chunkSize = 1000; 
     for (let i = 0; i < content.length; i += chunkSize) {
       const chunk = content.slice(i, i + chunkSize);
       if (chunk.trim().length > 50) {
@@ -52,7 +54,7 @@ async function ingestContent() {
   console.log(`${chunks.length} chunks carregados.`);
 }
 
-function findRelevantChunks(questionEmbedding, topK = 2) {
+function findRelevantChunks(questionEmbedding, topK = 5) { // AUMENTADO PARA 5
   const similarities = knowledgeBase.map((chunk) => {
     let dot = 0;
     for (let i = 0; i < questionEmbedding.length; i++) {
@@ -64,7 +66,7 @@ function findRelevantChunks(questionEmbedding, topK = 2) {
   return similarities.slice(0, topK);
 }
 
-async function askRAG(pergunta) {
+async function askRAG(pergunta, historico = "") {
   if (knowledgeBase.length === 0) {
     await ingestContent();
   }
@@ -78,23 +80,35 @@ async function askRAG(pergunta) {
     return "Desculpe, não encontrei informações sobre esse assunto no nosso site.";
   }
 
-  const contexto = relevantChunks.map(c => c.texto).join("\n\n").slice(0, 1500);
+  const contexto = relevantChunks.map(c => c.texto).join("\n\n").slice(0, 3000);
 
+  // NOVO PROMPT: Ensina a usar o histórico e não usar asteriscos
   const prompt = `
-Você é um assistente do site TEAjudo, especializado em TEA.
-Responda APENAS com as informações abaixo. Se não souber, diga que não encontrou.
+Você é o assistente virtual do TEAjudo, especializado em Transtorno do Espectro Autista (TEA).
+Seu objetivo é ajudar pais, cuidadores e pessoas autistas com informações acolhedoras e precisas.
 
-### INFORMAÇÕES DO SITE:
+DIRETRIZES:
+1. Use APENAS as informações do "CONTEXTO DO SITE" para responder.
+2. Use o "HISTÓRICO DA CONVERSA" para entender a que o usuário se refere (por exemplo, se ele usar palavras como "eles", "isso", "detalhe mais").
+3. Se a resposta não estiver no contexto, diga educadamente que não encontrou a informação no site.
+4. Se o usuário pedir para detalhar mais, busque no contexto todos os detalhes disponíveis sobre o assunto.
+5. Formate a resposta em tópicos ou parágrafos curtos.
+6. NÃO use asteriscos (**) para formatar o texto.
+
+### HISTÓRICO DA CONVERSA:
+${historico}
+
+### CONTEXTO DO SITE:
 ${contexto}
 
-### PERGUNTA:
+### PERGUNTA ATUAL DO USUÁRIO:
 ${pergunta}
 
-### RESPOSTA (use apenas as informações acima):
+### SUA RESPOSTA:
 `;
 
   const response = await ai.interactions.create({
-    model: "gemini-3.5-flash-lite",
+    model: "gemini-3.5-flash-lite", // Mantive o modelo lite que você estava usando
     input: prompt,
   });
 

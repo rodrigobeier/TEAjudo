@@ -99,19 +99,9 @@ input:focus-visible{
     font-size:26px;
     font-weight:700;
     letter-spacing:-.5px;
-    text-decoration:none;
+    text-decoration:none; 
     display:flex;
     align-items:center;
-    gap:10px;
-}
- 
-.logo::before{
-    content:"";
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:conic-gradient(var(--roxo-400),var(--verde-600),#f4b860,var(--roxo-400));
-    box-shadow:0 0 0 4px var(--roxo-100);
 }
  
 .nav{

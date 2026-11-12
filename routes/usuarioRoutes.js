@@ -5,13 +5,19 @@ const Usuario = require("../models/usuario");
 router.post("/cadastro", async (req, res) => {
   try {
     const { nome, email, senha } = req.body;
+    
     const existe = await Usuario.buscarPorEmail(email);
-    if (existe) return res.status(400).send("E-mail já cadastrado.");
+    
+    if (existe) {
+      // Em vez de tela branca, volta para o cadastro com a mensagem de erro
+      return res.render("cadastro", { erro: "Este e-mail já está cadastrado. Tente outro." });
+    }
 
     await Usuario.cadastrar(nome, email, senha);
     return res.redirect("/login");
   } catch (error) {
-    return res.status(500).send("Erro ao cadastrar.");
+    console.error(error);
+    return res.render("cadastro", { erro: "Erro interno ao cadastrar. Tente novamente." });
   }
 });
 
@@ -21,13 +27,15 @@ router.post("/login", async (req, res) => {
     const usuario = await Usuario.buscarPorEmail(email);
 
     if (!usuario || usuario.senha !== senha) {
-      return res.status(400).send("E-mail ou senha incorretos.");
+      // Em vez de tela branca, volta para o login com a mensagem de erro
+      return res.render("login", { erro: "E-mail ou senha incorretos." });
     }
 
     req.session.usuarioId = usuario.id;
     return res.redirect("/perfil");
   } catch (error) {
-    return res.status(500).send("Erro no login.");
+    console.error(error);
+    return res.render("login", { erro: "Erro interno ao fazer login." });
   }
 });
 
